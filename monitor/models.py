@@ -1,12 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 
-class Device(models.Model):
-    name = models.CharField(max_length=100)
-    ip_address = models.GenericIPAddressField()
+class Network(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    ip_address = models.GenericIPAddressField(unique=True)
     status = models.CharField(
-        max_length=10, choices=[("Online", "Online"), ("Offline", "Offline")]
+        max_length=20, choices=[("Online", "Online"), ("Offline", "Offline")]
     )
 
     def __str__(self):
@@ -14,23 +13,25 @@ class Device(models.Model):
 
 
 class NetworkMetric(models.Model):
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    network = models.ForeignKey(Network, on_delete=models.CASCADE)
     bandwidth_usage = models.FloatField()
     latency = models.FloatField()
     packet_loss = models.FloatField()
     recorded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Metrics for {self.device.name} at {self.recorded_at}"
+        return f"{self.network.name} - {self.recorded_at}"
 
 
 class Alert(models.Model):
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
-    message = models.CharField(max_length=255)
+    network = models.ForeignKey(
+        Network, on_delete=models.CASCADE, null=True, blank=True
+    )
+    message = models.TextField()
     severity = models.CharField(
         max_length=10, choices=[("Low", "Low"), ("Medium", "Medium"), ("High", "High")]
     )
-    triggered_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Alert: {self.message} ({self.severity})"
+        return f"Alert for {self.network.name if self.network else 'Unknown'}: {self.message}"

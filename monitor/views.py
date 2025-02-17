@@ -1,29 +1,40 @@
 from django.shortcuts import render
+from .models import Network, NetworkMetric
 
 
-from .models import Device, NetworkMetric, Alert
-import json
+def network_list(request):
+    """View to display all networks."""
+    networks = Network.objects.all()
+    return render(request, "network_list.html", {"networks": networks})
 
 
-def dashboard(request):
-    devices = Device.objects.all()
-    alerts = Alert.objects.all()
+def network_dashboard(request):
+    all_networks = Network.objects.all()
+    selected_network_name = request.GET.get("network", None)
+    selected_network = None
+    labels, bandwidth_usage, latency, packet_loss = [], [], [], []
 
-    # Prepare data for Chart.js
-    metrics = NetworkMetric.objects.all().order_by("-recorded_at")[
-        :10
-    ]  # Last 10 entries
-    labels = [m.recorded_at.strftime("%H:%M:%S") for m in metrics]
-    bandwidth_usage = [m.bandwidth_usage for m in metrics]
-    latency = [m.latency for m in metrics]
-    packet_loss = [m.packet_loss for m in metrics]
+    if selected_network_name:
+        selected_network = Network.objects.filter(name=selected_network_name).first()
+        if selected_network:
+            metrics = NetworkMetric.objects.filter(network=selected_network).order_by(
+                "recorded_at"
+            )
 
-    context = {
-        "devices": devices,
-        "alerts": alerts,
-        "labels": json.dumps(labels),
-        "bandwidth_usage": json.dumps(bandwidth_usage),
-        "latency": json.dumps(latency),
-        "packet_loss": json.dumps(packet_loss),
-    }
-    return render(request, "dashboard.html", context)
+            labels = [metric.recorded_at.strftime("%H:%M:%S") for metric in metrics]
+            bandwidth_usage = [metric.bandwidth_usage for metric in metrics]
+            latency = [metric.latency for metric in metrics]
+            packet_loss = [metric.packet_loss for metric in metrics]
+
+    return render(
+        request,
+        "network_dashboard.html",
+        {
+            "all_networks": all_networks,
+            "selected_network": selected_network,
+            "labels": labels,
+            "bandwidth_usage": bandwidth_usage,
+            "latency": latency,
+            "packet_loss": packet_loss,
+        },
+    )

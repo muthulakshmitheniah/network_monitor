@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from .views import network_list, network_dashboard
 
 urlpatterns = [
-    path("dashboard/", views.dashboard, name="dashboard"),
+    path("networks/", network_list, name="network_list"),
+    path("dashboard/", network_dashboard, name="network_dashboard"),
 ]

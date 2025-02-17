@@ -1,0 +1,31 @@
+network_name,ip_address,status,bandwidth_usage,latency,packet_loss,alert_message,alert_severity
+Network 1,192.168.1.1,Online,93.37,32.45,1.0,High latency detected,High
+Network 2,192.168.1.2,Offline,33.8,18.44,2.93,,
+Network 3,192.168.1.3,Online,51.62,8.63,1.71,,
+Network 4,192.168.1.4,Offline,15.92,38.56,0.22,,
+Network 5,192.168.1.5,Online,41.08,19.43,0.18,,
+Network 6,192.168.1.6,Offline,90.57,39.05,2.47,High latency detected,High
+Network 7,192.168.1.7,Online,94.04,28.74,3.22,,
+Network 8,192.168.1.8,Offline,90.98,23.43,2.44,,
+Network 9,192.168.1.9,Online,60.65,26.74,3.89,,
+Network 10,192.168.1.10,Offline,28.43,15.48,3.02,,
+Network 11,192.168.1.11,Online,73.93,8.48,0.62,High latency detected,High
+Network 12,192.168.1.12,Offline,55.18,42.55,4.1,,
+Network 13,192.168.1.13,Online,17.11,40.48,0.39,,
+Network 14,192.168.1.14,Offline,98.13,2.03,3.45,,
+Network 15,192.168.1.15,Online,74.38,22.25,0.07,,
+Network 16,192.168.1.16,Offline,95.94,44.49,3.25,High latency detected,High
+Network 17,192.168.1.17,Online,68.48,25.18,0.1,,
+Network 18,192.168.1.18,Offline,67.09,15.18,2.47,,
+Network 19,192.168.1.19,Online,37.17,34.67,3.12,,
+Network 20,192.168.1.20,Offline,13.79,27.21,3.05,,
+Network 21,192.168.1.21,Online,22.23,9.53,4.99,High latency detected,High
+Network 22,192.168.1.22,Offline,22.76,42.03,0.48,,
+Network 23,192.168.1.23,Online,80.45,23.0,2.49,,
+Network 24,192.168.1.24,Offline,55.42,39.47,4.61,,
+Network 25,192.168.1.25,Online,95.57,30.94,0.11,,
+Network 26,192.168.1.26,Offline,79.39,15.41,0.6,High latency detected,High
+Network 27,192.168.1.27,Online,22.8,29.83,3.16,,
+Network 28,192.168.1.28,Offline,39.65,47.1,3.47,,
+Network 29,192.168.1.29,Online,38.05,40.45,2.96,,
+Network 30,192.168.1.30,Offline,50.31,29.4,4.35,,
