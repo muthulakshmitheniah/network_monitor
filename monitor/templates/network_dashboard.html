@@ -64,40 +64,32 @@
 
         <script>
             var ctx = document.getElementById('networkChart').getContext('2d');
+        
             var chart = new Chart(ctx, {
-                type: 'line',
+                type: 'bar',  // Change to bar chart
                 data: {
                     labels: {{ labels|safe }},  // Ensure labels are properly populated
                     datasets: [
                         {
                             label: 'Bandwidth Usage',
                             data: {{ bandwidth_usage|safe }},
-                            borderColor: 'blue',
-                            backgroundColor: 'rgba(0, 0, 255, 0.2)',  // Light blue fill
-                            fill: true,
-                            pointRadius: 5,
-                            pointBackgroundColor: 'blue',
-                            tension: 0.3  // Makes the line smoother
+                            backgroundColor: 'blue',
+                            borderColor: 'darkblue',
+                            borderWidth: 1
                         },
                         {
                             label: 'Latency',
                             data: {{ latency|safe }},
-                            borderColor: 'red',
-                            backgroundColor: 'rgba(255, 0, 0, 0.2)',
-                            fill: true,
-                            pointRadius: 5,
-                            pointBackgroundColor: 'red',
-                            tension: 0.3
+                            backgroundColor: 'red',
+                            borderColor: 'darkred',
+                            borderWidth: 1
                         },
                         {
                             label: 'Packet Loss',
                             data: {{ packet_loss|safe }},
-                            borderColor: 'green',
-                            backgroundColor: 'rgba(0, 255, 0, 0.2)',
-                            fill: true,
-                            pointRadius: 5,
-                            pointBackgroundColor: 'green',
-                            tension: 0.3
+                            backgroundColor: 'green',
+                            borderColor: 'darkgreen',
+                            borderWidth: 1
                         }
                     ]
                 },
@@ -105,13 +97,10 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true
-                            }
+                            position: 'top'
                         },
                         tooltip: {
-                            enabled: true, 
+                            enabled: true,
                             mode: 'index',
                             intersect: false
                         }
@@ -135,7 +124,12 @@
             });
         </script>
         
+        
         {% endif %}
+        <div class="text-center mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">🔙 Back to Dashboard</a>
+        </div>
+        
     </div>
 </body>
 </html>

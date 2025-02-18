@@ -1,5 +1,8 @@
 from django.shortcuts import render
-from .models import Network, NetworkMetric
+from django.http import JsonResponse
+from .models import Network, NetworkMetric, Alert
+import os
+import pandas as pd
 
 
 def network_list(request):
@@ -38,3 +41,22 @@ def network_dashboard(request):
             "packet_loss": packet_loss,
         },
     )
+
+
+def dashboard_view(request):
+    return render(request, "dashboard.html")
+
+
+def get_alerts(network=None):
+    """Fetch the latest alerts. If a specific network is provided, filter by that network."""
+    if network:
+        return Alert.objects.filter(network=network).order_by("-created_at")[
+            :5
+        ]  # Latest 5 alerts for specific network
+    return Alert.objects.order_by("-created_at")[:5]  # Latest 5 alerts for all networks
+
+
+def alert_view(request):
+    """View to render alerts separately."""
+    alerts = get_alerts()
+    return render(request, "alert.html", {"alerts": alerts})

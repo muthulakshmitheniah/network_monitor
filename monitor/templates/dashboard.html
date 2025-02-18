@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Network Monitoring Dashboard</title>
+  <!-- Chart.js and Tailwind CSS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-gray-300 h-screen p-5 fixed shadow-lg">
+    <div class="flex items-center mb-8">
+      <img src="{% static 'logo.png' %}" alt="Logo" class="w-auto h-auto mx-auto">
+    </div>
+    <nav class="space-y-4">
+      <a href="#" class="block p-3 bg-blue-100 rounded-lg text-blue-600">🏠 Home</a>
+      <a href="{% url 'network_dashboard' %}" class="block p-3 hover:bg-blue-100 rounded-lg">📊 Analyze</a>
+      <a href="{% url 'network_list' %}" class="block p-3 hover:bg-blue-100 rounded-lg">📡 Network Data</a>
+      <a href="{% url 'alerts' %}" class="block p-3 hover:bg-red-100 rounded-lg">🚨 Alerts</a>
+      <a href="#" class="block p-3 hover:bg-gray-100 rounded-lg">⚙️ Settings</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 ml-64">
+    <!-- Navigation Bar -->
+    <nav class="bg-white p-4 shadow-md border-b border-gray-300">
+      <div class="container mx-auto flex items-center justify-between">
+        <h2 class="text-2xl font-semibold text-blue-500">📡 Live Network Monitoring</h2>
+      </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="container mx-auto p-6">
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4 text-blue-500">📡 Real-Time Network Signal</h2>
+        <canvas id="liveSignalChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let signalChart;
+    let signalData = [];
+    let bandwidthData = [];
+    let latencyData = [];
+    let packetLossData = [];
+    let labels = [];
+
+    function generateNetworkData() {
+      if (signalData.length >= 50) {
+        signalData.shift();
+        bandwidthData.shift();
+        latencyData.shift();
+        packetLossData.shift();
+        labels.shift();
+      }
+
+      let timeStamp = new Date().toLocaleTimeString();
+      let newSignal = 50 * Math.sin(Date.now() / 500) + Math.random() * 10;
+      let newBandwidth = Math.floor(Math.random() * 100) + 50;
+      let newLatency = Math.floor(Math.random() * 50) + 5;
+      let newPacketLoss = Math.random().toFixed(2);
+
+      signalData.push(newSignal);
+      bandwidthData.push(newBandwidth);
+      latencyData.push(newLatency);
+      packetLossData.push(newPacketLoss);
+      labels.push(timeStamp);
+    }
+
+    function renderChart() {
+      const ctx = document.getElementById("liveSignalChart").getContext("2d");
+      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, "rgba(0, 123, 255, 0.2)");
+      gradient.addColorStop(1, "rgba(0, 123, 255, 0)");
+
+      signalChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "Network Signal",
+            data: signalData,
+            borderColor: "#007bff",
+            borderWidth: 3,
+            backgroundColor: gradient,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.3,
+            fill: true,
+          }],
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          elements: {
+            line: { borderJoinStyle: "round" },
+          },
+          scales: {
+            y: { min: -60, max: 60, grid: { color: "#e5e7eb" }, ticks: { color: "#374151" } },
+            x: { grid: { color: "#e5e7eb" }, ticks: { color: "#374151" } },
+          },
+          plugins: {
+            legend: { labels: { color: "#374151" } },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  let index = tooltipItem.dataIndex;
+                  return [
+                    `📡 Signal: ${signalData[index].toFixed(2)}`,
+                    `📶 Bandwidth: ${bandwidthData[index]} Mbps`,
+                    `⏳ Latency: ${latencyData[index]} ms`,
+                    `📉 Packet Loss: ${packetLossData[index]}%`
+                  ];
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChart() {
+      generateNetworkData();
+      signalChart.data.labels = labels;
+      signalChart.data.datasets[0].data = signalData;
+      signalChart.update();
+    }
+
+    renderChart();
+    setInterval(updateChart, 2000);
+  </script>
+</body>
+</html>
