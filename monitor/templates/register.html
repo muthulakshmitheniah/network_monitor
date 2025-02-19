@@ -1,15 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background-color: #f4f4f4; /* Light background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333; /* Darker text for contrast */
+        }
+        .register-container {
+            background: #ffffff; /* White container */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        h2 {
+            color: #7671B4; /* Your requested color */
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #7671B4; /* Your color for borders */
+            border-radius: 6px;
+            background: #ffffff;
+            color: #333;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #5d58a5; /* Slightly darker for focus */
+            background: #f9f9f9;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #7671B4; /* Your button color */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease-in-out;
+        }
+        button:hover {
+            background: #5d58a5; /* Darker shade for hover */
+        }
+        .link {
+            display: block;
+            margin-top: 15px;
+            color: #7671B4;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h2>Register</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form>
-    <a href="{% url 'login' %}">Already have an account? Login</a>
+    <div class="register-container">
+        <h2>Create Your Account</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Sign Up</button>
+        </form>
+        <a href="{% url 'login' %}" class="link">Already have an account? Login</a>
+    </div>
 </body>
 </html>

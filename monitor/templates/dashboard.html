@@ -13,140 +13,111 @@
 
   <!-- Sidebar -->
   <aside class="w-64 bg-white border-r border-gray-300 h-screen p-5 fixed shadow-lg">
-    <div class="flex items-center mb-8">
-      <img src="{% static 'logo.png' %}" alt="Logo" class="w-auto h-auto mx-auto">
+    <div class="flex items-center justify-center mb-8">
+      <img src="{% static 'logo.png' %}" alt="Logo" class="w-32 h-auto">
     </div>
     <nav class="space-y-4">
-      <a href="#" class="block p-3 bg-blue-100 rounded-lg text-blue-600">🏠 Home</a>
-      <a href="{% url 'network_dashboard' %}" class="block p-3 hover:bg-blue-100 rounded-lg">📊 Analyze</a>
-      <a href="{% url 'network_list' %}" class="block p-3 hover:bg-blue-100 rounded-lg">📡 Network Data</a>
-      <a href="{% url 'alerts' %}" class="block p-3 hover:bg-red-100 rounded-lg">🚨 Alerts</a>
-      <a href="#" class="block p-3 hover:bg-gray-100 rounded-lg">⚙️ Settings</a>
+      <a href="#" class="block p-3 bg-[#E3E0FF] rounded-lg text-[#7671B4] font-semibold">🏠 Home</a>
+      <a href="{% url 'network_dashboard' %}" class="block p-3 hover:bg-[#E3E0FF] rounded-lg">📊 Analyze</a>
+      <a href="{% url 'network_list' %}" class="block p-3 hover:bg-[#E3E0FF] rounded-lg">📡 Network Data</a>
+      <a href="{% url 'alerts' %}" class="block p-3 hover:bg-[#FFEBEB] rounded-lg">🚨 Alerts</a>
+      <a href="#" class="block p-3 hover:bg-gray-200 rounded-lg">⚙️ Settings</a>
     </nav>
   </aside>
 
   <!-- Main Content -->
   <div class="flex-1 ml-64">
-  <!-- Navigation Bar -->
-<nav class="bg-white p-4 shadow-md border-b border-gray-300">
-  <div class="container mx-auto flex items-center justify-between">
-    <!-- Left: Title -->
-    <h2 class="text-2xl font-semibold text-blue-500">📡 Live Network Monitoring</h2>
-
-    <!-- Right: Add Network Button -->
-    <a href="{% url 'add_network_data' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-      ➕ Add Network
-    </a>
-    <form action="{% url 'logout' %}" method="post">
-      {% csrf_token %}
-      <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-        🚪 Logout
-      </button>
-    </form>
-  </div>
-</nav>
-
+    <!-- Navigation Bar -->
+    <nav class="bg-white p-4 shadow-md border-b border-gray-300 flex items-center justify-between">
+      <h2 class="text-2xl font-semibold text-[#7671B4]">📡 Live Network Monitoring</h2>
+      <div class="flex gap-4">
+        <a href="{% url 'add_network_data' %}" class="bg-[#7671B4] text-white px-4 py-2 rounded-lg hover:bg-[#5d58a5]">
+          ➕ Add Network
+        </a>
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+            🚪 Logout
+          </button>
+        </form>
+      </div>
+    </nav>
 
     <!-- Dashboard Content -->
     <div class="container mx-auto p-6">
       <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 text-blue-500">📡 Real-Time Network Signal</h2>
+        <h2 class="text-xl font-semibold mb-4 text-[#7671B4]">📡 Real-Time Network Signal</h2>
         <canvas id="liveSignalChart"></canvas>
       </div>
     </div>
   </div>
 
-  <script>
-    let signalChart;
-    let signalData = [];
-    let bandwidthData = [];
-    let latencyData = [];
-    let packetLossData = [];
-    let labels = [];
+<script>
+  let signalChart;
+  let labels = [];
+  let signalData = [];
+  const maxDataPoints = 20; // Maximum points on graph
 
-    function generateNetworkData() {
-      if (signalData.length >= 50) {
-        signalData.shift();
-        bandwidthData.shift();
-        latencyData.shift();
-        packetLossData.shift();
-        labels.shift();
-      }
+  function fetchNetworkData() {
+    fetch("{% url 'live_network_data' %}") // Fetch from backend API
+      .then(response => response.json())
+      .then(data => {
+        labels.push(data.time); // Timestamp
+        signalData.push(data.signal); // New signal value
 
-      let timeStamp = new Date().toLocaleTimeString();
-      let newSignal = 50 * Math.sin(Date.now() / 500) + Math.random() * 10;
-      let newBandwidth = Math.floor(Math.random() * 100) + 50;
-      let newLatency = Math.floor(Math.random() * 50) + 5;
-      let newPacketLoss = Math.random().toFixed(2);
+        // Maintain maxDataPoints for smooth graph transition
+        if (labels.length > maxDataPoints) {
+          labels.shift(); // Remove the first (oldest) label
+          signalData.shift(); // Remove the first (oldest) data point
+        }
 
-      signalData.push(newSignal);
-      bandwidthData.push(newBandwidth);
-      latencyData.push(newLatency);
-      packetLossData.push(newPacketLoss);
-      labels.push(timeStamp);
-    }
+        updateChart();
+      });
+  }
 
-    function renderChart() {
+  function updateChart() {
+    if (!signalChart) {
       const ctx = document.getElementById("liveSignalChart").getContext("2d");
-      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-      gradient.addColorStop(0, "rgba(0, 123, 255, 0.2)");
-      gradient.addColorStop(1, "rgba(0, 123, 255, 0)");
-
       signalChart = new Chart(ctx, {
         type: "line",
         data: {
-          labels,
-          datasets: [{
-            label: "Network Signal",
-            data: signalData,
-            borderColor: "#007bff",
-            borderWidth: 3,
-            backgroundColor: gradient,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            tension: 0.3,
-            fill: true,
-          }],
+          labels: labels,
+          datasets: [
+            {
+              label: "Signal Strength",
+              borderColor: "#7671B4",
+              backgroundColor: "rgba(118, 113, 180, 0.2)",
+              data: signalData,
+              fill: true,
+              tension: 0.3, // Smooth curve
+            },
+          ],
         },
         options: {
           responsive: true,
-          animation: false,
-          elements: {
-            line: { borderJoinStyle: "round" },
+          animation: {
+            duration: 800, // Smooth transitions
+            easing: "easeInOutQuad",
           },
           scales: {
-            y: { min: -60, max: 60, grid: { color: "#e5e7eb" }, ticks: { color: "#374151" } },
-            x: { grid: { color: "#e5e7eb" }, ticks: { color: "#374151" } },
+            y: {
+              beginAtZero: false,
+            },
           },
-          plugins: {
-            legend: { labels: { color: "#374151" } },
-            tooltip: {
-              callbacks: {
-                label: function (tooltipItem) {
-                  let index = tooltipItem.dataIndex;
-                  return [
-                    `📡 Signal: ${signalData[index].toFixed(2)}`,
-                    `📶 Bandwidth: ${bandwidthData[index]} Mbps`,
-                    `⏳ Latency: ${latencyData[index]} ms`,
-                    `📉 Packet Loss: ${packetLossData[index]}%`
-                  ];
-                }
-              }
-            }
-          }
-        }
+        },
       });
-    }
-
-    function updateChart() {
-      generateNetworkData();
+    } else {
+      // Smooth data transition without abrupt resets
       signalChart.data.labels = labels;
       signalChart.data.datasets[0].data = signalData;
-      signalChart.update();
+      signalChart.update("none"); // Prevent animation resets
     }
+  }
 
-    renderChart();
-    setInterval(updateChart, 2000);
-  </script>
+  // Fetch network data every 5 seconds
+  setInterval(fetchNetworkData, 2000);
+  fetchNetworkData(); // Initial fetch on page load
+</script>
+
 </body>
 </html>

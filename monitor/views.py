@@ -124,3 +124,71 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, "register.html", {"form": form})
+
+from django.http import JsonResponse
+from datetime import datetime
+import random
+
+
+def live_network_data(request):
+    networks = Network.objects.all()
+
+    data = {
+        "labels": [],
+        "bandwidth_usage": [],
+        "latency": [],
+        "packet_loss": [],
+        "signal": [],
+        "alerts": [],  # Add alerts key to send notifications
+    }
+
+    for network in networks:
+        latest_metric = (
+            NetworkMetric.objects.filter(network=network)
+            .order_by("-recorded_at")
+            .first()
+        )
+
+        if latest_metric:
+            recorded_time = latest_metric.recorded_at.strftime("%H:%M:%S")
+            bandwidth = latest_metric.bandwidth_usage
+            latency = latest_metric.latency
+            packet_loss = latest_metric.packet_loss
+        else:
+            recorded_time = datetime.now().strftime("%H:%M:%S")
+            bandwidth = random.uniform(50, 100)
+            latency = random.uniform(20, 100)
+            packet_loss = random.uniform(0, 5)
+
+        # Simulate real-time fluctuations
+        bandwidth += random.uniform(-5, 5)
+        latency += random.uniform(-5, 5)
+        packet_loss += random.uniform(-2, 2)
+        signal = bandwidth * 0.5 + latency * 0.2
+
+        # Append metrics
+        data["labels"].append(recorded_time)
+        data["bandwidth_usage"].append(round(bandwidth, 2))
+        data["latency"].append(round(latency, 2))
+        data["packet_loss"].append(round(packet_loss, 2))
+        data["signal"].append(round(signal, 2))
+
+        # **Generate Alerts based on thresholds**
+        if bandwidth > 95 or latency > 150 or packet_loss > 10:
+            data["alerts"].append(
+                {
+                    "network": network.name,
+                    "message": "🚨 CRITICAL: Network experiencing severe issues!",
+                    "severity": "Critical",
+                }
+            )
+        elif bandwidth > 80 or latency > 100 or packet_loss > 5:
+            data["alerts"].append(
+                {
+                    "network": network.name,
+                    "message": "⚠️ MAJOR: Network performance degradation detected.",
+                    "severity": "Major",
+                }
+            )
+
+    return JsonResponse(data)

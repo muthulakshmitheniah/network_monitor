@@ -1,15 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-    <a href="{% url 'register' %}">Don't have an account? Register</a>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-lg w-96 border border-gray-200">
+        <h2 class="text-3xl text-[#7671B4] font-semibold text-center mb-6">Login</h2>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}  <!-- Keeping Django's form rendering intact -->
+
+            <button class="w-full bg-[#7671B4] hover:bg-[#5d58a5] text-white py-2 rounded-md transition">
+                Login
+            </button>
+        </form>
+
+        <p class="text-gray-500 text-sm mt-4 text-center">
+            Don't have an account? 
+            <a href="{% url 'register' %}" class="text-[#7671B4] hover:underline">Register</a>
+        </p>
+    </div>
+
 </body>
 </html>
