@@ -1,16 +1,23 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import Network, NetworkMetric, Alert
 import os
 import pandas as pd
+from .forms import NetworkForm, NetworkMetricForm, AlertForm
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from .decorators import group_required
 
 
+@group_required("Admin", "User")
 def network_list(request):
     """View to display all networks."""
     networks = Network.objects.all()
     return render(request, "network_list.html", {"networks": networks})
 
 
+@group_required("Admin", "User")
 def network_dashboard(request):
     all_networks = Network.objects.all()
     selected_network_name = request.GET.get("network", None)
@@ -43,6 +50,7 @@ def network_dashboard(request):
     )
 
 
+@group_required("Admin", "User")
 def dashboard_view(request):
     return render(request, "dashboard.html")
 
@@ -60,3 +68,59 @@ def alert_view(request):
     """View to render alerts separately."""
     alerts = get_alerts()
     return render(request, "alert.html", {"alerts": alerts})
+
+
+@group_required("Admin")
+def add_network_data(request, network_id=None):
+    network = None
+    if network_id:
+        network = Network.objects.get(id=network_id)  # Fetch the selected network
+
+    if request.method == "POST":
+        network_form = NetworkForm(request.POST)
+        metric_form = NetworkMetricForm(request.POST)
+        alert_form = AlertForm(request.POST)
+
+        if network_form.is_valid() and metric_form.is_valid() and alert_form.is_valid():
+            if not network:
+                network = network_form.save()  # Create new network if not provided
+
+            metric = metric_form.save(commit=False)
+            metric.network = network  # Auto-assign the network
+            metric.save()
+
+            if alert_form.cleaned_data.get("message") and alert_form.cleaned_data.get(
+                "severity"
+            ):
+                alert = alert_form.save(commit=False)
+                alert.network = network  # Auto-assign the network
+                alert.save()
+
+            return redirect("network_list")  # Redirect to a list view
+    else:
+        network_form = NetworkForm(instance=network) if network else NetworkForm()
+        metric_form = NetworkMetricForm()
+        alert_form = AlertForm()
+
+    return render(
+        request,
+        "add_network_data.html",
+        {
+            "network_form": network_form,
+            "metric_form": metric_form,
+            "alert_form": alert_form,
+            "network": network,
+        },
+    )
+
+
+def register(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Log the user in after registration
+            return redirect("dashboard")
+    else:
+        form = UserCreationForm()
+    return render(request, "register.html", {"form": form})

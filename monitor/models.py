@@ -7,7 +7,7 @@ class Network(models.Model):
     status = models.CharField(
         max_length=20, choices=[("Online", "Online"), ("Offline", "Offline")]
     )
-+
+
     def __str__(self):
         return self.name
 

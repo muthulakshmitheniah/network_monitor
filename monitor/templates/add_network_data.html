@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Network Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            margin: auto;
+        }
+        h2, h3 {
+            text-align: center;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .form-section {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Add New Network Data</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Network Information -->
+        <div class="form-section">
+            <h3>Network Information</h3>
+            {% if network %}
+                <p><strong>Network Name:</strong> {{ network.name }}</p>
+                <p><strong>IP Address:</strong> {{ network.ip_address }}</p>
+                <input type="hidden" name="network" value="{{ network.id }}">
+            {% else %}
+                {{ network_form.as_p }}
+            {% endif %}
+        </div>
+
+        <!-- Network Metrics -->
+        <div class="form-section">
+            <h3>Network Metrics</h3>
+            {{ metric_form.as_p }}
+        </div>
+
+        <!-- Alert (Optional) -->
+        <div class="form-section">
+            <h3>Alert (Optional)</h3>
+            {{ alert_form.as_p }}
+        </div>
+
+        <button type="submit">Save Data</button>
+    </form>
+
+</body>
+</html>

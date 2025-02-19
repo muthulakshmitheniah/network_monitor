@@ -27,12 +27,25 @@
 
   <!-- Main Content -->
   <div class="flex-1 ml-64">
-    <!-- Navigation Bar -->
-    <nav class="bg-white p-4 shadow-md border-b border-gray-300">
-      <div class="container mx-auto flex items-center justify-between">
-        <h2 class="text-2xl font-semibold text-blue-500">📡 Live Network Monitoring</h2>
-      </div>
-    </nav>
+  <!-- Navigation Bar -->
+<nav class="bg-white p-4 shadow-md border-b border-gray-300">
+  <div class="container mx-auto flex items-center justify-between">
+    <!-- Left: Title -->
+    <h2 class="text-2xl font-semibold text-blue-500">📡 Live Network Monitoring</h2>
+
+    <!-- Right: Add Network Button -->
+    <a href="{% url 'add_network_data' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+      ➕ Add Network
+    </a>
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+        🚪 Logout
+      </button>
+    </form>
+  </div>
+</nav>
+
 
     <!-- Dashboard Content -->
     <div class="container mx-auto p-6">
